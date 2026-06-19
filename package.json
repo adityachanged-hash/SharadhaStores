@@ -1,0 +1,16 @@
+{
+  "name": "festival-combo-builder-workspace",
+  "version": "1.0.0",
+  "description": "Workspace for Sharadha Stores Festival Combo Pack Builder",
+  "private": true,
+  "scripts": {
+    "install:all": "npm install --prefix backend && npm install --prefix frontend",
+    "dev:backend": "npm run dev --prefix backend",
+    "dev:frontend": "npm run dev --prefix frontend",
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "start": "concurrently \"npm run start --prefix backend\" \"npm run preview --prefix frontend\""
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

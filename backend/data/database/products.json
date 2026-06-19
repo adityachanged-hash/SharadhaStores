@@ -1,0 +1,176 @@
+[
+  {
+    "_id": "prod_1781497493458_0",
+    "name": "Special Ghee Laddu",
+    "category": "Sweets",
+    "price": 250,
+    "stock": 63,
+    "image": "https://www.sweets2home.com/wp-content/uploads/2024/10/ghee-laddu-1.jpg",
+    "ingredients": [
+      "Gram flour (Besan)",
+      "Pure Ghee",
+      "Sugar",
+      "Cardamom",
+      "Cashews"
+    ],
+    "shelfLifeDate": "2026-07-15",
+    "availability": true,
+    "createdAt": "2026-06-15T04:24:53.458Z",
+    "updatedAt": "2026-06-19T13:18:14.948Z"
+  },
+  {
+    "_id": "prod_1781497493459_1",
+    "name": "Royal Mysore Pak",
+    "category": "Sweets",
+    "price": 300,
+    "stock": 3,
+    "image": "/public/images/mysore_pak.png",
+    "ingredients": [
+      "Gram flour (Besan)",
+      "Ghee",
+      "Sugar",
+      "Water"
+    ],
+    "shelfLifeDate": "2026-07-10",
+    "availability": true,
+    "createdAt": "2026-06-15T04:24:53.459Z",
+    "updatedAt": "2026-06-19T16:43:00.506Z"
+  },
+  {
+    "_id": "prod_1781497493459_2",
+    "name": "Kai Murukku (Butter)",
+    "category": "Snacks",
+    "price": 150,
+    "stock": 60,
+    "image": "/public/images/kai_murukku.png",
+    "ingredients": [
+      "Rice flour",
+      "Urad dal flour",
+      "Butter",
+      "Cumin seeds",
+      "Asafoetida",
+      "Salt",
+      "Refined oil"
+    ],
+    "shelfLifeDate": "2026-08-30",
+    "availability": true,
+    "createdAt": "2026-06-15T04:24:53.459Z",
+    "updatedAt": "2026-06-15T04:24:53.459Z"
+  },
+  {
+    "_id": "prod_1781497493459_3",
+    "name": "Madras Spicy Mixture",
+    "category": "Snacks",
+    "price": 160,
+    "stock": 45,
+    "image": "/public/images/spicy_mixture.jpg",
+    "ingredients": [
+      "Besan omapodi",
+      "Boondi",
+      "Peanuts",
+      "Cashews",
+      "Curry leaves",
+      "Chili powder",
+      "Salt"
+    ],
+    "shelfLifeDate": "2026-08-15",
+    "availability": true,
+    "createdAt": "2026-06-15T04:24:53.459Z",
+    "updatedAt": "2026-06-15T04:24:53.459Z"
+  },
+  {
+    "_id": "prod_1781497493459_4",
+    "name": "Kerala Banana Chips",
+    "category": "Snacks",
+    "price": 140,
+    "stock": 5,
+    "image": "/public/images/banana_chips.png",
+    "ingredients": [
+      "Raw Nendran Bananas",
+      "Coconut Oil",
+      "Turmeric powder",
+      "Salt"
+    ],
+    "shelfLifeDate": "2026-07-25",
+    "availability": true,
+    "createdAt": "2026-06-15T04:24:53.459Z",
+    "updatedAt": "2026-06-15T04:24:53.459Z"
+  },
+  {
+    "_id": "prod_1781497493459_5",
+    "name": "Homemade Mango Pickle",
+    "category": "Condiments",
+    "price": 120,
+    "stock": 24,
+    "image": "/public/images/mango_pickle.png",
+    "ingredients": [
+      "Raw Mangoes",
+      "Mustard powder",
+      "Fenugreek powder",
+      "Red chili powder",
+      "Sesame Oil",
+      "Salt"
+    ],
+    "shelfLifeDate": "2026-12-15",
+    "availability": true,
+    "createdAt": "2026-06-15T04:24:53.459Z",
+    "updatedAt": "2026-06-19T17:08:44.817Z"
+  },
+  {
+    "_id": "prod_1781497493459_6",
+    "name": "Organic Jaggery Kaju Katli",
+    "category": "Sweets",
+    "price": 420,
+    "stock": 28,
+    "image": "/public/images/kaju_katli.png",
+    "ingredients": [
+      "Cashews",
+      "Organic Jaggery",
+      "Ghee",
+      "Silver leaf (optional)"
+    ],
+    "shelfLifeDate": "2026-07-20",
+    "availability": true,
+    "createdAt": "2026-06-15T04:24:53.459Z",
+    "updatedAt": "2026-06-19T08:24:29.980Z"
+  },
+  {
+    "_id": "prod_1781497493459_7",
+    "name": "Premium Dry Fruit Box",
+    "category": "Premium",
+    "price": 500,
+    "stock": 15,
+    "image": "/public/images/dry_fruit_box.png",
+    "ingredients": [
+      "Almonds",
+      "Cashews",
+      "Pistachios",
+      "Raisins",
+      "Walnuts"
+    ],
+    "shelfLifeDate": "2026-09-15",
+    "availability": true,
+    "createdAt": "2026-06-15T04:24:53.459Z",
+    "updatedAt": "2026-06-15T04:24:53.459Z"
+  },
+  {
+    "_id": "prod_1781497493459_8",
+    "name": "Festival Combo Sample Pack",
+    "category": "Premium",
+    "price": 50,
+    "stock": 97,
+    "image": "/public/images/combo_sample_pack.png",
+    "ingredients": [
+      "Ghee Laddu (1 pc)",
+      "Mysore Pak (1 pc)",
+      "Kai Murukku (1 pc)",
+      "Madras Spicy Mixture (50g)",
+      "Banana Chips (50g)",
+      "Mango Pickle (small cup)"
+    ],
+    "shelfLifeDate": "2026-07-25",
+    "availability": true,
+    "createdAt": "2026-06-19T13:00:00.000Z",
+    "updatedAt": "2026-06-19T13:34:52.246Z"
+  }
+]

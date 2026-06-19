@@ -1,0 +1,33 @@
+[
+  {
+    "_id": "combo_1781497831814_8",
+    "comboName": "Diwali Delight Premium Hamper",
+    "festivalType": "Diwali",
+    "items": [
+      {
+        "_id": "item_1781497831814_0",
+        "product": "prod_1781497493459_5",
+        "quantity": 6
+      }
+    ],
+    "basePrice": 720,
+    "discount": 8,
+    "finalPrice": 662,
+    "giftNote": "thank you for choosing us.",
+    "image": "",
+    "status": "Draft",
+    "stockStatus": "In Stock",
+    "history": [
+      {
+        "action": "Combo Created",
+        "details": "Created combo with initial price ₹662 (8% off ₹720)."
+      },
+      {
+        "action": "Stock Status Evaluated",
+        "details": "Stock evaluation resulted in: In Stock. 0 warning(s) found."
+      }
+    ],
+    "createdAt": "2026-06-15T04:30:31.814Z",
+    "updatedAt": "2026-06-15T04:30:31.814Z"
+  }
+]

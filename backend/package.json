@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "start": "node server.js",
-    "dev": "node server.js"
+    "dev": "node server.js",
+    "build": "cd .. && npm install --prefix frontend && npm run build --prefix frontend"
   },
   "dependencies": {
     "cors": "^2.8.5",

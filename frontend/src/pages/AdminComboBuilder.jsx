@@ -110,7 +110,11 @@ const AdminComboBuilder = () => {
       try {
         const response = await fetch(`${API_URL}/api/products`);
         if (response.ok) {
-          const data = await response.json();
+          const text = await response.text();
+      if (!response.ok) {
+        throw new Error(text || `Request failed with status ${response.status}`);
+      }
+      const data = text ? JSON.parse(text) : {};
           setProductsCatalog(data);
           if (data.length > 0) {
             setSelectedProductId(data[0]._id);
@@ -133,7 +137,11 @@ const AdminComboBuilder = () => {
         try {
           const response = await fetch(`${API_URL}/api/combos/${id}`);
           if (!response.ok) throw new Error('Combo not found');
-          const data = await response.json();
+          const text = await response.text();
+      if (!response.ok) {
+        throw new Error(text || `Request failed with status ${response.status}`);
+      }
+      const data = text ? JSON.parse(text) : {};
           
           setComboName(data.comboName);
           setFestivalType(data.festivalType);
@@ -177,7 +185,11 @@ const AdminComboBuilder = () => {
         try {
           const response = await fetch(`${API_URL}/api/combos/suggest?festivalType=Diwali`);
           if (response.ok) {
-            const suggestedCombo = await response.json();
+            const text = await response.text();
+      if (!response.ok) {
+        throw new Error(text || `Request failed with status ${response.status}`);
+      }
+      const suggestedCombo = text ? JSON.parse(text) : {};
             setComboName(suggestedCombo.comboName);
             setFestivalType(suggestedCombo.festivalType);
             setDiscount(suggestedCombo.discount);
@@ -369,7 +381,11 @@ const AdminComboBuilder = () => {
         body: JSON.stringify(payload)
       });
 
-      const data = await response.json();
+      const text = await response.text();
+      if (!response.ok) {
+        throw new Error(text || `Request failed with status ${response.status}`);
+      }
+      const data = text ? JSON.parse(text) : {};
 
       if (!response.ok) {
         throw new Error(data.message || 'Failed to save combo pack');

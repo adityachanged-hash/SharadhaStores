@@ -43,7 +43,11 @@ const Dashboard = () => {
       if (!response.ok) {
         throw new Error('Failed to fetch dashboard stats');
       }
-      const data = await response.json();
+      const text = await response.text();
+      if (!response.ok) {
+        throw new Error(text || `Request failed with status ${response.status}`);
+      }
+      const data = text ? JSON.parse(text) : {};
       setStats(data);
 
       const walletRes = await fetch(`${API_URL}/api/wallet/admin@sharadha.com`);
@@ -63,7 +67,11 @@ const Dashboard = () => {
     try {
       const response = await fetch(`${API_URL}/api/feedback`);
       if (response.ok) {
-        const data = await response.json();
+        const text = await response.text();
+      if (!response.ok) {
+        throw new Error(text || `Request failed with status ${response.status}`);
+      }
+      const data = text ? JSON.parse(text) : {};
         setFeedbacks(data);
       }
     } catch (err) {
@@ -87,7 +95,11 @@ const Dashboard = () => {
         body: JSON.stringify({ status: nextStatus })
       });
 
-      const data = await response.json();
+      const text = await response.text();
+      if (!response.ok) {
+        throw new Error(text || `Request failed with status ${response.status}`);
+      }
+      const data = text ? JSON.parse(text) : {};
 
       if (!response.ok) {
         throw new Error(data.message || 'Action failed');
@@ -160,7 +172,11 @@ const Dashboard = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus })
       });
-      const data = await response.json();
+      const text = await response.text();
+      if (!response.ok) {
+        throw new Error(text || `Request failed with status ${response.status}`);
+      }
+      const data = text ? JSON.parse(text) : {};
 
       if (!response.ok) {
         throw new Error('Failed to update order status');

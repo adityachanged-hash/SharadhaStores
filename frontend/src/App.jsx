@@ -59,7 +59,7 @@ function AppContent() {
       {showBgLogo && (
         <>
           <img 
-            src="/public/images/logo.png" 
+            src="/logo.png" 
             alt="" 
             style={{
               position: 'fixed',

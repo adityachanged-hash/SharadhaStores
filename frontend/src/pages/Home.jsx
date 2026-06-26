@@ -31,7 +31,11 @@ const Home = () => {
         try {
           const response = await fetch(`${API_URL}/api/combos?status=Published`);
           if (response.ok) {
-            const data = await response.json();
+            const text = await response.text();
+      if (!response.ok) {
+        throw new Error(text || `Request failed with status ${response.status}`);
+      }
+      const data = text ? JSON.parse(text) : {};
             setPublishedCombos(data);
           }
         } catch (err) {

@@ -46,7 +46,11 @@ const Login = () => {
         })
       });
 
-      const data = await response.json();
+      const text = await response.text();
+      if (!response.ok) {
+        throw new Error(text || `Request failed with status ${response.status}`);
+      }
+      const data = text ? JSON.parse(text) : {};
 
       if (!response.ok) {
         throw new Error(data.message || 'Login failed');
@@ -107,7 +111,7 @@ const Login = () => {
         }}>
           {/* Large animated background logo */}
           <img
-            src="/public/images/logo.png"
+            src="/logo.png"
             alt=""
             style={{
               position: 'absolute',
@@ -187,7 +191,7 @@ const Login = () => {
 
               {/* Saffron Glowing Central Logo */}
               <img
-                src="/public/images/logo.png"
+                src="/logo.png"
                 alt="Sharadha Stores Logo"
                 style={{
                   width: '100px',
@@ -389,7 +393,7 @@ const Login = () => {
           borderBottom: '1px solid var(--cream-border)'
         }}>
           <img
-            src="/public/images/logo.png"
+            src="/logo.png"
             alt="Sharadha Stores Logo"
             style={{
               width: '60px',

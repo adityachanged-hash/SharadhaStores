@@ -16,7 +16,11 @@ const SuggestionModal = ({ isOpen, onClose, onApply }) => {
       if (!response.ok) {
         throw new Error('Failed to fetch smart suggestions');
       }
-      const data = await response.json();
+      const text = await response.text();
+      if (!response.ok) {
+        throw new Error(text || `Request failed with status ${response.status}`);
+      }
+      const data = text ? JSON.parse(text) : {};
       setSuggestion(data);
     } catch (err) {
       console.error(err);

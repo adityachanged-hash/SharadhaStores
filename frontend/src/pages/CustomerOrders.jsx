@@ -62,7 +62,11 @@ const CustomerOrders = () => {
       if (!response.ok) {
         throw new Error('Failed to fetch orders');
       }
-      const data = await response.json();
+      const text = await response.text();
+      if (!response.ok) {
+        throw new Error(text || `Request failed with status ${response.status}`);
+      }
+      const data = text ? JSON.parse(text) : {};
       setOrders(data);
       
       // Fetch Wallet Balance
@@ -84,7 +88,11 @@ const CustomerOrders = () => {
     try {
       const response = await fetch(`${API_URL}/api/feedback?customerEmail=${encodeURIComponent(user.email)}`);
       if (response.ok) {
-        const data = await response.json();
+        const text = await response.text();
+      if (!response.ok) {
+        throw new Error(text || `Request failed with status ${response.status}`);
+      }
+      const data = text ? JSON.parse(text) : {};
         setFeedbacks(data);
       }
     } catch (err) {
@@ -102,7 +110,11 @@ const CustomerOrders = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: 'Cancelled' })
       });
-      const data = await response.json();
+      const text = await response.text();
+      if (!response.ok) {
+        throw new Error(text || `Request failed with status ${response.status}`);
+      }
+      const data = text ? JSON.parse(text) : {};
       
       if (!response.ok) {
         throw new Error(data.message || 'Failed to cancel order.');
@@ -1192,7 +1204,7 @@ const CustomerOrders = () => {
             }} className="packaging-card">
               <div style={{ width: '180px', height: '150px', overflow: 'hidden', flexShrink: 0 }}>
                 <img 
-                  src="/public/images/packaging/gift_pack.png" 
+                  src="/gift-packing.jpg" 
                   alt="Gift Packing Example" 
                   style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.5s ease' }} 
                   className="packaging-img"

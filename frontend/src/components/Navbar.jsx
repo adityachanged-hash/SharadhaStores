@@ -96,7 +96,7 @@ const Navbar = () => {
         }}>
           {/* Rotating ambient background logo */}
           <img 
-            src="/public/images/logo.png" 
+            src="/logo.png" 
             alt="" 
             style={{
               position: 'absolute',
@@ -146,7 +146,7 @@ const Navbar = () => {
               }}></div>
 
               <img 
-                src="/public/images/logo.png" 
+                src="/logo.png" 
                 alt="Sharadha Stores Logo" 
                 style={{
                   width: '90px',
@@ -331,7 +331,7 @@ const Navbar = () => {
         {/* Brand Logo */}
         <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <img 
-            src="/public/images/logo.png" 
+            src="/logo.png" 
             alt="Sharadha Stores Logo" 
             style={{
               width: '40px',

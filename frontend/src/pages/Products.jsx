@@ -50,7 +50,11 @@ const Products = () => {
         body: JSON.stringify({ amount: restockAmount })
       });
 
-      const data = await response.json();
+      const text = await response.text();
+      if (!response.ok) {
+        throw new Error(text || `Request failed with status ${response.status}`);
+      }
+      const data = text ? JSON.parse(text) : {};
       if (!response.ok) {
         throw new Error(data.message || 'Restock failed');
       }
@@ -74,7 +78,11 @@ const Products = () => {
       if (!response.ok) {
         throw new Error('Failed to fetch products');
       }
-      const data = await response.json();
+      const text = await response.text();
+      if (!response.ok) {
+        throw new Error(text || `Request failed with status ${response.status}`);
+      }
+      const data = text ? JSON.parse(text) : {};
       setProducts(data);
     } catch (err) {
       console.error(err);
@@ -137,7 +145,11 @@ const Products = () => {
           walletApplied
         })
       });
-      const data = await response.json();
+      const text = await response.text();
+      if (!response.ok) {
+        throw new Error(text || `Request failed with status ${response.status}`);
+      }
+      const data = text ? JSON.parse(text) : {};
 
       if (!response.ok) {
         throw new Error(data.message || 'Failed to place order');
@@ -262,7 +274,7 @@ const Products = () => {
                 animation: 'successRipple 2.5s ease-out infinite'
               }}></div>
               <img 
-                src="/public/images/logo.png" 
+                src="/logo.png" 
                 alt="Sharadha Stores Logo" 
                 style={{
                   width: '80px',

@@ -72,7 +72,11 @@ const ComboDetail = () => {
           walletApplied
         })
       });
-      const data = await response.json();
+      const text = await response.text();
+      if (!response.ok) {
+        throw new Error(text || `Request failed with status ${response.status}`);
+      }
+      const data = text ? JSON.parse(text) : {};
 
       if (!response.ok) {
         throw new Error(data.message || 'Failed to place order');
@@ -99,7 +103,11 @@ const ComboDetail = () => {
       if (!response.ok) {
         throw new Error('Combo pack not found');
       }
-      const data = await response.json();
+      const text = await response.text();
+      if (!response.ok) {
+        throw new Error(text || `Request failed with status ${response.status}`);
+      }
+      const data = text ? JSON.parse(text) : {};
       setCombo(data);
     } catch (err) {
       console.error(err);
@@ -128,7 +136,11 @@ const ComboDetail = () => {
       const response = await fetch(`${API_URL}/api/combos/${id}/process`, {
         method: 'POST'
       });
-      const data = await response.json();
+      const text = await response.text();
+      if (!response.ok) {
+        throw new Error(text || `Request failed with status ${response.status}`);
+      }
+      const data = text ? JSON.parse(text) : {};
 
       if (!response.ok) {
         throw new Error(data.message || 'Processing failed');

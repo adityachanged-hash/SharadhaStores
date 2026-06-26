@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Sparkles, X, Check, AlertTriangle, HelpCircle } from 'lucide-react';
+import API_URL from "../config/api";
 
 const SuggestionModal = ({ isOpen, onClose, onApply }) => {
   const [selectedFestival, setSelectedFestival] = useState('Diwali');
@@ -11,7 +12,7 @@ const SuggestionModal = ({ isOpen, onClose, onApply }) => {
     setLoading(true);
     setError('');
     try {
-      const response = await fetch(`/api/combos/suggest?festivalType=${festival}`);
+      const response = await fetch(`${API_URL}/api/combos/suggest?festivalType=${festival}`);
       if (!response.ok) {
         throw new Error('Failed to fetch smart suggestions');
       }

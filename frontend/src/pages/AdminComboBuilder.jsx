@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Sparkles, ShoppingBag, Plus, Trash2, Save, FileText, AlertTriangle, ArrowLeft, Percent, Calculator, ShoppingCart } from 'lucide-react';
 import SuggestionModal from '../components/SuggestionModal.jsx';
 import Toast from '../components/Toast.jsx';
+import API_URL from "../config/api";
 
 const getFestivalPackingPreview = (type) => {
   switch (type) {
@@ -107,7 +108,7 @@ const AdminComboBuilder = () => {
   useEffect(() => {
     const fetchCatalog = async () => {
       try {
-        const response = await fetch('/api/products');
+        const response = await fetch(`${API_URL}/api/products`);
         if (response.ok) {
           const data = await response.json();
           setProductsCatalog(data);
@@ -130,7 +131,7 @@ const AdminComboBuilder = () => {
       const fetchCombo = async () => {
         setLoading(true);
         try {
-          const response = await fetch(`/api/combos/${id}`);
+          const response = await fetch(`${API_URL}/api/combos/${id}`);
           if (!response.ok) throw new Error('Combo not found');
           const data = await response.json();
           
@@ -174,7 +175,7 @@ const AdminComboBuilder = () => {
     if (!isEditMode && productsCatalog.length > 0) {
       const loadDefaultSuggestion = async () => {
         try {
-          const response = await fetch('/api/combos/suggest?festivalType=Diwali');
+          const response = await fetch(`${API_URL}/api/combos/suggest?festivalType=Diwali`);
           if (response.ok) {
             const suggestedCombo = await response.json();
             setComboName(suggestedCombo.comboName);

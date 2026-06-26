@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ClipboardList, Calendar, CheckCircle, Clock, AlertTriangle, ArrowRight, ShoppingBag, Eye, MapPin, CreditCard, PackageCheck, Truck, Gift } from 'lucide-react';
 import Toast from '../components/Toast.jsx';
+import API_URL from "../config/api";
 
 const StepIcon = ({ name, size = 18, color }) => {
   switch (name) {
@@ -57,7 +58,7 @@ const CustomerOrders = () => {
     setLoading(true);
     try {
       // Filter by customer email on the server-side
-      const response = await fetch(`/api/orders?customerEmail=${encodeURIComponent(user.email)}`);
+      const response = await fetch(`${API_URL}/api/orders?customerEmail=${encodeURIComponent(user.email)}`);
       if (!response.ok) {
         throw new Error('Failed to fetch orders');
       }
@@ -65,7 +66,7 @@ const CustomerOrders = () => {
       setOrders(data);
       
       // Fetch Wallet Balance
-      const walletRes = await fetch(`/api/wallet/${encodeURIComponent(user.email)}`);
+      const walletRes = await fetch(`${API_URL}/api/wallet/${encodeURIComponent(user.email)}`);
       if (walletRes.ok) {
         const walletData = await walletRes.json();
         setWalletBalance(walletData.balance || 0);
@@ -81,7 +82,7 @@ const CustomerOrders = () => {
   const fetchFeedbacks = async () => {
     if (!user) return;
     try {
-      const response = await fetch(`/api/feedback?customerEmail=${encodeURIComponent(user.email)}`);
+      const response = await fetch(`${API_URL}/api/feedback?customerEmail=${encodeURIComponent(user.email)}`);
       if (response.ok) {
         const data = await response.json();
         setFeedbacks(data);
@@ -96,7 +97,7 @@ const CustomerOrders = () => {
     }
     
     try {
-      const response = await fetch(`/api/orders/${orderId}/status`, {
+      const response = await fetch(`${API_URL}/api/orders/${orderId}/status`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: 'Cancelled' })
@@ -140,7 +141,7 @@ const CustomerOrders = () => {
     if (!suggestionText.trim()) return;
     setIsSubmittingSuggestion(true);
     try {
-      const response = await fetch('/api/feedback', {
+      const response = await fetch(`${API_URL}/api/feedback`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -169,7 +170,7 @@ const CustomerOrders = () => {
     if (rating === 0 || !reviewComment.trim()) return;
     setIsSubmittingReview(true);
     try {
-      const response = await fetch('/api/feedback', {
+      const response = await fetch(`${API_URL}/api/feedback`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

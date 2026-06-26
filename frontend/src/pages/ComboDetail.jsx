@@ -16,6 +16,7 @@ import {
   ShoppingCart
 } from 'lucide-react';
 import Toast from '../components/Toast.jsx';
+import API_URL from "../config/api";
 
 const ComboDetail = () => {
   // Load current user profile for role-based view adjustments
@@ -58,7 +59,7 @@ const ComboDetail = () => {
       const initialTotal = subtotal + tax + shipping;
       const walletApplied = useWallet ? Math.min(walletBalance, initialTotal) : 0;
 
-      const response = await fetch('/api/orders', {
+      const response = await fetch(`${API_URL}/api/orders`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -94,7 +95,7 @@ const ComboDetail = () => {
 
   const fetchComboDetail = async () => {
     try {
-      const response = await fetch(`/api/combos/${id}`);
+      const response = await fetch(`${API_URL}/api/combos/${id}`);
       if (!response.ok) {
         throw new Error('Combo pack not found');
       }
@@ -112,7 +113,7 @@ const ComboDetail = () => {
     fetchComboDetail();
     
     if (user) {
-      fetch(`/api/wallet/${encodeURIComponent(user.email)}`)
+      fetch(`${API_URL}/api/wallet/${encodeURIComponent(user.email)}`)
         .then(res => res.ok ? res.json() : { balance: 0 })
         .then(data => setWalletBalance(data.balance || 0))
         .catch(console.error);
@@ -124,7 +125,7 @@ const ComboDetail = () => {
     setProcessing(true);
     setRecommendationResult('');
     try {
-      const response = await fetch(`/api/combos/${id}/process`, {
+      const response = await fetch(`${API_URL}/api/combos/${id}/process`, {
         method: 'POST'
       });
       const data = await response.json();

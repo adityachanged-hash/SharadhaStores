@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Sparkles, ArrowRight, LayoutDashboard, Gift, Database, ShoppingCart, CheckCircle } from 'lucide-react';
 import ComboCard from '../components/ComboCard.jsx';
+import API_URL from "../config/api";
 
 const Home = () => {
   const [user, setUser] = useState(null);
@@ -28,7 +29,7 @@ const Home = () => {
       const fetchPublished = async () => {
         setLoadingCombos(true);
         try {
-          const response = await fetch('/api/combos?status=Published');
+          const response = await fetch(`${API_URL}/api/combos?status=Published`);
           if (response.ok) {
             const data = await response.json();
             setPublishedCombos(data);

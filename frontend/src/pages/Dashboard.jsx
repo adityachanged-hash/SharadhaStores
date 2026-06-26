@@ -16,6 +16,7 @@ import {
   Plus
 } from 'lucide-react';
 import Toast from '../components/Toast.jsx';
+import API_URL from "../config/api";
 
 const Dashboard = () => {
   const [stats, setStats] = useState(null);
@@ -45,7 +46,7 @@ const Dashboard = () => {
       const data = await response.json();
       setStats(data);
 
-      const walletRes = await fetch('/api/wallet/admin@sharadha.com');
+      const walletRes = await fetch(`${API_URL}/api/wallet/admin@sharadha.com`);
       if (walletRes.ok) {
         const walletData = await walletRes.json();
         setAdminWalletBalance(walletData.balance || 0);
@@ -60,7 +61,7 @@ const Dashboard = () => {
 
   const fetchFeedbacks = async () => {
     try {
-      const response = await fetch('/api/feedback');
+      const response = await fetch(`${API_URL}/api/feedback`);
       if (response.ok) {
         const data = await response.json();
         setFeedbacks(data);
@@ -80,7 +81,7 @@ const Dashboard = () => {
     const nextStatus = currentStatus === 'Published' ? 'Draft' : 'Published';
 
     try {
-      const response = await fetch(`/api/combos/${id}`, {
+      const response = await fetch(`${API_URL}/api/combos/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: nextStatus })
@@ -107,7 +108,7 @@ const Dashboard = () => {
     }
 
     try {
-      const response = await fetch(`/api/combos/${id}`, {
+      const response = await fetch(`${API_URL}/api/combos/${id}`, {
         method: 'DELETE'
       });
 
@@ -154,7 +155,7 @@ const Dashboard = () => {
     }
 
     try {
-      const response = await fetch(`/api/orders/${orderId}/status`, {
+      const response = await fetch(`${API_URL}/api/orders/${orderId}/status`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus })

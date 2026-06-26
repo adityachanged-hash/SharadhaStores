@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Sparkles, ShoppingBag, Plus, Trash2, Save, FileText, AlertTriangle, ArrowLeft, Percent, Calculator, ShoppingCart } from 'lucide-react';
 import SuggestionModal from '../components/SuggestionModal.jsx';
 import Toast from '../components/Toast.jsx';
+import API_URL from "../config/api";
 
 const getFestivalPackingPreview = (type) => {
   switch (type) {
@@ -120,7 +121,7 @@ const CustomerComboBuilder = () => {
   useEffect(() => {
     const fetchCatalog = async () => {
       try {
-        const response = await fetch('/api/products');
+        const response = await fetch(`${API_URL}/api/products`);
         if (response.ok) {
           const data = await response.json();
           setProductsCatalog(data);
@@ -137,7 +138,7 @@ const CustomerComboBuilder = () => {
     fetchCatalog();
 
     if (user) {
-      fetch(`/api/wallet/${encodeURIComponent(user.email)}`)
+      fetch(`${API_URL}/api/wallet/${encodeURIComponent(user.email)}`)
         .then(res => res.ok ? res.json() : { balance: 0 })
         .then(data => setWalletBalance(data.balance || 0))
         .catch(console.error);
@@ -150,7 +151,7 @@ const CustomerComboBuilder = () => {
       const fetchCombo = async () => {
         setLoading(true);
         try {
-          const response = await fetch(`/api/combos/${id}`);
+          const response = await fetch(`${API_URL}/api/combos/${id}`);
           if (!response.ok) throw new Error('Combo not found');
           const data = await response.json();
           
@@ -194,7 +195,7 @@ const CustomerComboBuilder = () => {
     if (!isEditMode && productsCatalog.length > 0) {
       const loadDefaultSuggestion = async () => {
         try {
-          const response = await fetch('/api/combos/suggest?festivalType=Diwali');
+          const response = await fetch(`${API_URL}/api/combos/suggest?festivalType=Diwali`);
           if (response.ok) {
             const suggestedCombo = await response.json();
             setComboName(suggestedCombo.comboName);
@@ -459,7 +460,7 @@ const CustomerComboBuilder = () => {
         status: 'Draft' // Keep as draft so it doesn't appear on general storefront
       };
 
-      const comboRes = await fetch('/api/combos', {
+      const comboRes = await fetch(`${API_URL}/api/combos`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(comboPayload)
@@ -490,7 +491,7 @@ const CustomerComboBuilder = () => {
         walletApplied: useWallet ? Math.min(walletBalance, total) : 0
       };
 
-      const orderRes = await fetch('/api/orders', {
+      const orderRes = await fetch(`${API_URL}/api/orders`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(orderPayload)
@@ -499,7 +500,7 @@ const CustomerComboBuilder = () => {
       const orderData = await orderRes.json();
       if (!orderRes.ok) {
         // If order fails, try to clean up the combo
-        await fetch(`/api/combos/${newComboId}`, { method: 'DELETE' });
+        await fetch(`${API_URL}/api/combos/${newComboId}`, { method: 'DELETE' });
         throw new Error(orderData.message || 'Failed to place order.');
       }
 

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Database, AlertCircle, CheckCircle, Flame, Calendar, Tag, ShoppingCart } from 'lucide-react';
 import Toast from '../components/Toast.jsx';
+import API_URL from "../config/api";
 
 const Products = () => {
   const navigate = useNavigate();
@@ -43,7 +44,7 @@ const Products = () => {
     if (restockAmount <= 0) return;
     setIsRestocking(true);
     try {
-      const response = await fetch(`/api/products/${restockProductItem._id}/restock`, {
+      const response = await fetch(`${API_URL}/api/products/${restockProductItem._id}/restock`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ amount: restockAmount })
@@ -69,7 +70,7 @@ const Products = () => {
   const fetchProducts = async () => {
     setLoading(true);
     try {
-      const response = await fetch('/api/products');
+      const response = await fetch(`${API_URL}/api/products`);
       if (!response.ok) {
         throw new Error('Failed to fetch products');
       }
@@ -87,7 +88,7 @@ const Products = () => {
     fetchProducts();
 
     if (user) {
-      fetch(`/api/wallet/${encodeURIComponent(user.email)}`)
+      fetch(`${API_URL}/api/wallet/${encodeURIComponent(user.email)}`)
         .then(res => res.ok ? res.json() : { balance: 0 })
         .then(data => setWalletBalance(data.balance || 0))
         .catch(console.error);
@@ -121,7 +122,7 @@ const Products = () => {
       const initialTotal = subtotal + tax + shipping + giftCharges;
       const walletApplied = useWallet ? Math.min(walletBalance, initialTotal) : 0;
 
-      const response = await fetch('/api/orders', {
+      const response = await fetch(`${API_URL}/api/orders`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

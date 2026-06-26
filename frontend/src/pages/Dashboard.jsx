@@ -1,16 +1,16 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { 
-  Gift, 
-  Layers, 
-  FileText, 
-  AlertTriangle, 
-  Eye, 
-  Edit2, 
-  Trash2, 
-  Check, 
-  Search, 
-  Filter, 
+import {
+  Gift,
+  Layers,
+  FileText,
+  AlertTriangle,
+  Eye,
+  Edit2,
+  Trash2,
+  Check,
+  Search,
+  Filter,
   Calendar,
   Package,
   Plus
@@ -22,7 +22,7 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [adminWalletBalance, setAdminWalletBalance] = useState(0);
-  
+
   // Search & Filter State
   const [searchTerm, setSearchTerm] = useState('');
   const [filterFestival, setFilterFestival] = useState('All');
@@ -37,7 +37,8 @@ const Dashboard = () => {
 
   const fetchStats = async () => {
     try {
-      const response = await fetch('/api/dashboard');
+      const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+      const response = await fetch(`${API_URL}/api/dashboard`);
       if (!response.ok) {
         throw new Error('Failed to fetch dashboard stats');
       }
@@ -77,7 +78,7 @@ const Dashboard = () => {
   // Quick Action: Publish/Draft Toggle
   const handlePublishToggle = async (id, currentStatus, items) => {
     const nextStatus = currentStatus === 'Published' ? 'Draft' : 'Published';
-    
+
     try {
       const response = await fetch(`/api/combos/${id}`, {
         method: 'PUT',
@@ -151,7 +152,7 @@ const Dashboard = () => {
         return null;
       }
     }
-    
+
     try {
       const response = await fetch(`/api/orders/${orderId}/status`, {
         method: 'PUT',
@@ -159,13 +160,13 @@ const Dashboard = () => {
         body: JSON.stringify({ status: newStatus })
       });
       const data = await response.json();
-      
+
       if (!response.ok) {
         throw new Error('Failed to update order status');
       }
 
       setToast({ message: `Order status updated to ${newStatus}!`, type: 'success' });
-      
+
       // Get order details to send WhatsApp message to customer
       const order = stats.recentOrders?.find(o => o._id === orderId);
       if (order && order.phoneNumber) {
@@ -227,11 +228,11 @@ const Dashboard = () => {
       </div>
 
       {/* KPI Grid */}
-      <section style={{ 
-        display: 'grid', 
-        gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', 
-        gap: '24px', 
-        marginBottom: '8px' 
+      <section style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+        gap: '24px',
+        marginBottom: '8px'
       }}>
         {/* Card 1: Total Revenue */}
         <div className="card" style={{ display: 'flex', alignItems: 'center', gap: '20px', borderTop: '4px solid var(--primary-saffron)' }}>
@@ -418,7 +419,7 @@ const Dashboard = () => {
             marginTop: '8px'
           }}>
             {lowStockAlerts.map(prod => (
-              <div 
+              <div
                 key={prod._id}
                 style={{
                   backgroundColor: 'var(--white)',
@@ -454,10 +455,10 @@ const Dashboard = () => {
           <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', alignItems: 'center' }}>
             {/* Search Input */}
             <div style={{ position: 'relative', minWidth: '200px' }}>
-              <input 
-                type="text" 
-                className="form-input" 
-                placeholder="Search combo..." 
+              <input
+                type="text"
+                className="form-input"
+                placeholder="Search combo..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 style={{ paddingLeft: '36px', paddingRight: '16px' }}
@@ -466,8 +467,8 @@ const Dashboard = () => {
             </div>
 
             {/* Festival Filter */}
-            <select 
-              className="form-select" 
+            <select
+              className="form-select"
               style={{ width: 'auto', padding: '10px 16px' }}
               value={filterFestival}
               onChange={(e) => setFilterFestival(e.target.value)}
@@ -486,8 +487,8 @@ const Dashboard = () => {
             </select>
 
             {/* Status Filter */}
-            <select 
-              className="form-select" 
+            <select
+              className="form-select"
               style={{ width: 'auto', padding: '10px 16px' }}
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
@@ -615,10 +616,10 @@ const Dashboard = () => {
                           </Link>
 
                           {/* Delete details */}
-                          <button 
-                            onClick={() => handleDeleteCombo(combo._id, combo.comboName)} 
-                            className="btn btn-danger" 
-                            style={{ padding: '6px' }} 
+                          <button
+                            onClick={() => handleDeleteCombo(combo._id, combo.comboName)}
+                            className="btn btn-danger"
+                            style={{ padding: '6px' }}
                             title="Delete Hamper"
                           >
                             <Trash2 size={14} />
@@ -776,7 +777,7 @@ const Dashboard = () => {
         const estDate = new Date(orderDate);
         estDate.setDate(orderDate.getDate() + 7);
         const options = { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' };
-        
+
         return (
           <div style={{
             position: 'fixed',
@@ -827,7 +828,7 @@ const Dashboard = () => {
 
               {/* Modal Body */}
               <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                
+
                 {/* Status and Dates */}
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                   <div style={{ backgroundColor: 'var(--cream-dark)', padding: '12px', borderRadius: '6px', border: '1px solid var(--cream-border)' }}>
@@ -976,9 +977,9 @@ const Dashboard = () => {
                       </div>
                       <div style={{
                         backgroundColor: selectedOrder.status === 'Delivered' ? 'var(--forest-green)' :
-                                         selectedOrder.status === 'Cancelled' ? '#e65100' :
-                                         selectedOrder.status === 'Shipped' ? '#1976d2' :
-                                         selectedOrder.status === 'Packed' ? 'var(--primary-saffron)' : '#757575',
+                          selectedOrder.status === 'Cancelled' ? '#e65100' :
+                            selectedOrder.status === 'Shipped' ? '#1976d2' :
+                              selectedOrder.status === 'Packed' ? 'var(--primary-saffron)' : '#757575',
                         color: 'white',
                         borderRadius: '4px',
                         padding: '4px 12px',
@@ -988,9 +989,9 @@ const Dashboard = () => {
                         letterSpacing: '0.5px'
                       }}>
                         {selectedOrder.status === 'Cancelled' ? 'REFUNDED' :
-                         selectedOrder.status === 'Delivered' ? '✓ SETTLED' :
-                         selectedOrder.status === 'Shipped' ? 'IN TRANSIT' :
-                         selectedOrder.status === 'Packed' ? 'CONFIRMED' : 'PENDING'}
+                          selectedOrder.status === 'Delivered' ? '✓ SETTLED' :
+                            selectedOrder.status === 'Shipped' ? 'IN TRANSIT' :
+                              selectedOrder.status === 'Packed' ? 'CONFIRMED' : 'PENDING'}
                       </div>
                     </div>
                   </div>
@@ -1007,7 +1008,7 @@ const Dashboard = () => {
                         {selectedOrder.history.map((log, i, arr) => {
                           const logTime = new Date(log.timestamp);
                           const logTimeFormatted = logTime.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' }) + ' at ' +
-                                                   logTime.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+                            logTime.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
                           return (
                             <div key={i} style={{ display: 'flex', gap: '10px', position: 'relative' }}>
                               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'relative' }}>
@@ -1123,17 +1124,17 @@ const Dashboard = () => {
               Read reviews, star ratings, and general packaging or product requests.
             </p>
           </div>
-          
+
           {/* Feed Filter Buttons */}
           <div style={{ display: 'flex', gap: '8px', border: '1px solid var(--cream-border)', borderRadius: '6px', padding: '4px', backgroundColor: 'var(--cream-dark)' }}>
-            <button 
+            <button
               className={`btn ${activeFeedTab === 'reviews' ? 'btn-primary' : 'btn-secondary'}`}
               style={{ padding: '6px 12px', fontSize: '0.8rem', border: 'none', cursor: 'pointer' }}
               onClick={() => setActiveFeedTab('reviews')}
             >
               Reviews ({feedbacks.filter(f => f.type === 'review').length})
             </button>
-            <button 
+            <button
               className={`btn ${activeFeedTab === 'suggestions' ? 'btn-primary' : 'btn-secondary'}`}
               style={{ padding: '6px 12px', fontSize: '0.8rem', border: 'none', cursor: 'pointer' }}
               onClick={() => setActiveFeedTab('suggestions')}
@@ -1153,12 +1154,12 @@ const Dashboard = () => {
             ) : (
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '20px' }}>
                 {feedbacks.filter(f => f.type === 'review').map((review) => (
-                  <div 
-                    key={review._id} 
-                    style={{ 
-                      border: '1px solid var(--cream-border)', 
-                      borderRadius: '8px', 
-                      padding: '16px', 
+                  <div
+                    key={review._id}
+                    style={{
+                      border: '1px solid var(--cream-border)',
+                      borderRadius: '8px',
+                      padding: '16px',
                       backgroundColor: '#fffdfa',
                       display: 'flex',
                       flexDirection: 'column',
@@ -1177,7 +1178,7 @@ const Dashboard = () => {
                         ))}
                       </div>
                     </div>
-                    
+
                     <div style={{ fontSize: '0.75rem', color: 'var(--charcoal-light)', borderTop: '1px solid #f2eedb', borderBottom: '1px solid #f2eedb', padding: '6px 0', display: 'flex', flexDirection: 'column', gap: '2px' }}>
                       <div>Order ID: <code>{review.orderId}</code></div>
                       <div>Hamper: <strong>{review.comboName}</strong></div>
@@ -1204,12 +1205,12 @@ const Dashboard = () => {
             ) : (
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '20px' }}>
                 {feedbacks.filter(f => f.type === 'suggestion').map((suggestion) => (
-                  <div 
-                    key={suggestion._id} 
-                    style={{ 
-                      border: '1px solid var(--cream-border)', 
-                      borderRadius: '8px', 
-                      padding: '16px', 
+                  <div
+                    key={suggestion._id}
+                    style={{
+                      border: '1px solid var(--cream-border)',
+                      borderRadius: '8px',
+                      padding: '16px',
                       backgroundColor: '#fffdfa',
                       display: 'flex',
                       flexDirection: 'column',

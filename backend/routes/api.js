@@ -13,6 +13,7 @@ import { getDashboardStats } from '../controllers/dashboardController.js';
 import { loginUser } from '../controllers/authController.js';
 import { createOrder, getOrders, updateOrderStatus } from '../controllers/orderController.js';
 import { createFeedback, getFeedback } from '../controllers/feedbackController.js';
+import { getWalletBalance } from '../controllers/walletController.js';
 
 const router = express.Router();
 
@@ -45,5 +46,8 @@ router.put('/orders/:id/status', updateOrderStatus);
 // Feedback & Suggestions
 router.post('/feedback', createFeedback);
 router.get('/feedback', getFeedback);
+
+// Wallets
+router.get('/wallet/:email', getWalletBalance);
 
 export default router;

@@ -113,6 +113,8 @@ const CustomerComboBuilder = () => {
   const [paymentMethod, setPaymentMethod] = useState('UPI');
   const [giftWrap, setGiftWrap] = useState(false);
   const [ordering, setOrdering] = useState(false);
+  const [walletBalance, setWalletBalance] = useState(0);
+  const [useWallet, setUseWallet] = useState(false);
 
   // Fetch products catalog
   useEffect(() => {
@@ -133,6 +135,13 @@ const CustomerComboBuilder = () => {
       }
     };
     fetchCatalog();
+
+    if (user) {
+      fetch(`/api/wallet/${encodeURIComponent(user.email)}`)
+        .then(res => res.ok ? res.json() : { balance: 0 })
+        .then(data => setWalletBalance(data.balance || 0))
+        .catch(console.error);
+    }
   }, []);
 
   // Fetch combo details if in edit mode
@@ -477,7 +486,8 @@ const CustomerComboBuilder = () => {
         shippingAddress,
         phoneNumber,
         paymentMethod,
-        giftCharges
+        giftCharges,
+        walletApplied: useWallet ? Math.min(walletBalance, total) : 0
       };
 
       const orderRes = await fetch('/api/orders', {
@@ -1164,7 +1174,9 @@ const CustomerComboBuilder = () => {
         const tax = Math.round(subtotal * 0.05);
         const shipping = subtotal >= 1000 ? 0 : 80;
         const giftCharges = giftWrap ? 50 : 0;
-        const total = subtotal + tax + shipping + giftCharges;
+        const initialTotal = subtotal + tax + shipping + giftCharges;
+        const walletDeduction = useWallet ? Math.min(walletBalance, initialTotal) : 0;
+        const total = initialTotal - walletDeduction;
 
         return (
           <div style={{
@@ -1309,6 +1321,33 @@ const CustomerComboBuilder = () => {
                   </label>
                 </div>
 
+                {walletBalance > 0 && (
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '10px',
+                    backgroundColor: '#fffdf8',
+                    padding: '12px 14px',
+                    border: '1.5px solid var(--primary-saffron)',
+                    borderRadius: '6px',
+                    marginTop: '8px',
+                    cursor: 'pointer'
+                  }} onClick={() => setUseWallet(prev => !prev)}>
+                    <input
+                      type="checkbox"
+                      id="useWallet"
+                      checked={useWallet}
+                      onChange={() => {}}
+                      onClick={(e) => e.stopPropagation()}
+                      style={{ width: '18px', height: '18px', cursor: 'pointer', accentColor: 'var(--primary-saffron)' }}
+                    />
+                    <label htmlFor="useWallet" style={{ fontSize: '0.9rem', fontWeight: 700, cursor: 'pointer', display: 'flex', justifyContent: 'space-between', width: '100%', margin: 0, color: 'var(--dark-charcoal)' }}>
+                      <span>💳 Use Wallet Balance (Available: ₹{walletBalance})</span>
+                      <span style={{ color: 'var(--primary-saffron)' }}>-₹{walletDeduction}</span>
+                    </label>
+                  </div>
+                )}
+
                 {/* Invoice Breakup */}
                 <div style={{
                   borderTop: '2px solid var(--cream-border)',
@@ -1334,6 +1373,12 @@ const CustomerComboBuilder = () => {
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                       <span>Gift Wrapping Fee:</span>
                       <span>₹50</span>
+                    </div>
+                  )}
+                  {useWallet && walletDeduction > 0 && (
+                    <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--primary-saffron)', fontWeight: 600 }}>
+                      <span>Wallet Deduction:</span>
+                      <span>-₹{walletDeduction}</span>
                     </div>
                   )}
                   <div style={{

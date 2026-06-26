@@ -22,6 +22,8 @@ const Products = () => {
   const [purchaseQty, setPurchaseQty] = useState(1);
   const [giftWrap, setGiftWrap] = useState(false);
   const [ordering, setOrdering] = useState(false);
+  const [walletBalance, setWalletBalance] = useState(0);
+  const [useWallet, setUseWallet] = useState(false);
   const [toast, setToast] = useState(null);
   const [showOrderSuccess, setShowOrderSuccess] = useState(false);
   const [orderedSampleProduct, setOrderedSampleProduct] = useState(false);
@@ -83,6 +85,13 @@ const Products = () => {
 
   useEffect(() => {
     fetchProducts();
+
+    if (user) {
+      fetch(`/api/wallet/${encodeURIComponent(user.email)}`)
+        .then(res => res.ok ? res.json() : { balance: 0 })
+        .then(data => setWalletBalance(data.balance || 0))
+        .catch(console.error);
+    }
   }, []);
 
   const handleBuyNow = (product) => {
@@ -106,6 +115,12 @@ const Products = () => {
     setOrdering(true);
     try {
       const giftCharges = giftWrap ? 50 : 0;
+      const subtotal = selectedProduct.price * purchaseQty;
+      const tax = Math.round(subtotal * 0.05);
+      const shipping = subtotal >= 1000 ? 0 : 80;
+      const initialTotal = subtotal + tax + shipping + giftCharges;
+      const walletApplied = useWallet ? Math.min(walletBalance, initialTotal) : 0;
+
       const response = await fetch('/api/orders', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -117,7 +132,8 @@ const Products = () => {
           shippingAddress,
           phoneNumber,
           paymentMethod,
-          giftCharges
+          giftCharges,
+          walletApplied
         })
       });
       const data = await response.json();
@@ -129,10 +145,7 @@ const Products = () => {
       const isSample = selectedProduct && selectedProduct.name.toLowerCase().includes('sample');
       setOrderedSampleProduct(isSample);
 
-      const subtotal = selectedProduct.price * purchaseQty;
-      const tax = Math.round(subtotal * 0.05);
-      const shipping = subtotal >= 1000 ? 0 : 80;
-      const totalAmt = subtotal + tax + shipping + giftCharges;
+      const totalAmt = initialTotal - walletApplied;
       const cleanPhone = phoneNumber.replace(/\D/g, '');
       setSuccessInfo({
         itemName: selectedProduct.name,
@@ -634,7 +647,9 @@ const Products = () => {
         const tax = Math.round(subtotal * 0.05);
         const shipping = subtotal >= 1000 ? 0 : 80;
         const giftCharges = giftWrap ? 50 : 0;
-        const total = subtotal + tax + shipping + giftCharges;
+        const initialTotal = subtotal + tax + shipping + giftCharges;
+        const walletDeduction = useWallet ? Math.min(walletBalance, initialTotal) : 0;
+        const total = initialTotal - walletDeduction;
 
         return (
           <div style={{
@@ -820,6 +835,33 @@ const Products = () => {
                   </label>
                 </div>
 
+                {walletBalance > 0 && (
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '10px',
+                    backgroundColor: '#fffdf8',
+                    padding: '12px 14px',
+                    border: '1.5px solid var(--primary-saffron)',
+                    borderRadius: '6px',
+                    marginTop: '8px',
+                    cursor: 'pointer'
+                  }} onClick={() => setUseWallet(prev => !prev)}>
+                    <input
+                      type="checkbox"
+                      id="useWalletProduct"
+                      checked={useWallet}
+                      onChange={() => {}}
+                      onClick={(e) => e.stopPropagation()}
+                      style={{ width: '18px', height: '18px', cursor: 'pointer', accentColor: 'var(--primary-saffron)' }}
+                    />
+                    <label htmlFor="useWalletProduct" style={{ fontSize: '0.9rem', fontWeight: 700, cursor: 'pointer', display: 'flex', justifyContent: 'space-between', width: '100%', margin: 0, color: 'var(--dark-charcoal)' }}>
+                      <span>💳 Use Wallet Balance (Available: ₹{walletBalance})</span>
+                      <span style={{ color: 'var(--primary-saffron)' }}>-₹{walletDeduction}</span>
+                    </label>
+                  </div>
+                )}
+
                 {/* Invoice Breakup */}
                 <div style={{
                   borderTop: '2px solid var(--cream-border)',
@@ -845,6 +887,12 @@ const Products = () => {
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                       <span>Gift Wrapping Fee:</span>
                       <span>₹50</span>
+                    </div>
+                  )}
+                  {useWallet && walletDeduction > 0 && (
+                    <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--primary-saffron)', fontWeight: 600 }}>
+                      <span>Wallet Deduction:</span>
+                      <span>-₹{walletDeduction}</span>
                     </div>
                   )}
                   <div style={{

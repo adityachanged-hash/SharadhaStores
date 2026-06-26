@@ -3,7 +3,7 @@ import { db } from '../config/db.js';
 // Create a new order (Checkout Billing)
 export const createOrder = async (req, res) => {
   try {
-    const { customerName, customerEmail, comboId, productId, quantity = 1, shippingAddress, paymentMethod, phoneNumber } = req.body;
+    const { customerName, customerEmail, comboId, productId, quantity = 1, shippingAddress, paymentMethod, phoneNumber, walletApplied = 0 } = req.body;
 
     // 1. Validation
     if (!customerName || !customerEmail || (!comboId && !productId) || !shippingAddress || !paymentMethod) {
@@ -100,7 +100,23 @@ export const createOrder = async (req, res) => {
     const giftCharges = Number(req.body.giftCharges || 0);
     const tax = Math.round(subtotal * 0.05); // 5% GST standard food tax
     const shipping = subtotal >= 1000 ? 0 : 80; // Free shipping over ₹1000, else ₹80
-    const total = subtotal + tax + shipping + giftCharges;
+    let total = subtotal + tax + shipping + giftCharges;
+
+    // 3.5 Apply Wallet Balance if requested
+    const walletDeduction = Number(walletApplied);
+    if (walletDeduction > 0) {
+      const currentBalance = await db.Wallets.getBalance(customerEmail);
+      if (walletDeduction > currentBalance) {
+        return res.status(400).json({ message: 'Insufficient wallet balance.' });
+      }
+      if (walletDeduction > total) {
+        return res.status(400).json({ message: 'Wallet deduction cannot exceed total order value.' });
+      }
+      
+      await db.Wallets.deductBalance(customerEmail, walletDeduction);
+      total -= walletDeduction;
+      newOrderPayload.notes = (newOrderPayload.notes || '') + `\n[Wallet Applied: ₹${walletDeduction}]`;
+    }
 
     newOrderPayload.items = orderItems;
     newOrderPayload.subtotal = subtotal;
@@ -219,6 +235,18 @@ export const updateOrderStatus = async (req, res) => {
             }
           }
         }
+      }
+      
+      // Credit 50% refund to customer wallet
+      const refundAmount = updates.total; // already Math.round(order.total / 2)
+      if (refundAmount > 0 && order.customerEmail) {
+        await db.Wallets.addBalance(order.customerEmail, refundAmount);
+      }
+      
+      // Retain remaining 50% in admin's wallet as cancellation revenue
+      const remainingAmount = order.total - refundAmount;
+      if (remainingAmount > 0) {
+        await db.Wallets.addBalance('admin@sharadha.com', remainingAmount);
       }
     }
 

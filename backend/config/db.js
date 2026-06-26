@@ -23,6 +23,7 @@ const COMBOS_JSON_PATH         = path.join(JSON_DB_DIR, 'combos.json');
 const RECOMMENDATIONS_JSON_PATH = path.join(JSON_DB_DIR, 'recommendations.json');
 const ORDERS_JSON_PATH         = path.join(JSON_DB_DIR, 'orders.json');
 const FEEDBACK_JSON_PATH       = path.join(JSON_DB_DIR, 'feedback.json');
+const WALLETS_JSON_PATH        = path.join(JSON_DB_DIR, 'wallets.json');
 
 // Initialize empty JSON files if they don't exist
 const initJsonFile = (filePath, defaultVal = []) => {
@@ -36,6 +37,7 @@ initJsonFile(COMBOS_JSON_PATH);
 initJsonFile(ORDERS_JSON_PATH);
 initJsonFile(RECOMMENDATIONS_JSON_PATH);
 initJsonFile(FEEDBACK_JSON_PATH);
+initJsonFile(WALLETS_JSON_PATH);
 
 // JSON helpers
 const readJson = (filePath) => {
@@ -148,6 +150,12 @@ const createPostgresTables = async () => {
       combo_id     TEXT  DEFAULT '',
       suggestions  JSONB DEFAULT '[]',
       generated_at TIMESTAMPTZ DEFAULT NOW()
+    );
+
+    CREATE TABLE IF NOT EXISTS customer_wallets (
+      email        TEXT PRIMARY KEY,
+      balance      NUMERIC DEFAULT 0,
+      updated_at   TIMESTAMPTZ DEFAULT NOW()
     );
   `);
   console.log('✅ PostgreSQL tables created / verified.');
@@ -742,6 +750,73 @@ export const db = {
         list.push(newFb);
         writeJson(FEEDBACK_JSON_PATH, list);
         return newFb;
+      }
+    }
+  },
+
+  // ── Customer Wallets ────────────────────────────────────────────────────────
+  Wallets: {
+    getBalance: async (email) => {
+      const emailLower = email.toLowerCase();
+      if (mode === 'PostgreSQL') {
+        const { rows } = await pgPool.query('SELECT balance FROM customer_wallets WHERE email = $1', [emailLower]);
+        return rows[0] ? parseFloat(rows[0].balance) : 0;
+      } else {
+        const wallets = readJson(WALLETS_JSON_PATH);
+        const w = wallets.find(w => w.email === emailLower);
+        return w ? Number(w.balance) : 0;
+      }
+    },
+    addBalance: async (email, amount) => {
+      const emailLower = email.toLowerCase();
+      if (mode === 'PostgreSQL') {
+        const { rows } = await pgPool.query(
+          `INSERT INTO customer_wallets (email, balance, updated_at) 
+           VALUES ($1, $2, NOW()) 
+           ON CONFLICT (email) DO UPDATE 
+           SET balance = customer_wallets.balance + $2, updated_at = NOW() RETURNING balance`,
+          [emailLower, amount]
+        );
+        return parseFloat(rows[0].balance);
+      } else {
+        const wallets = readJson(WALLETS_JSON_PATH);
+        const idx = wallets.findIndex(w => w.email === emailLower);
+        let newBal = amount;
+        if (idx !== -1) {
+          wallets[idx].balance = Number(wallets[idx].balance) + amount;
+          wallets[idx].updatedAt = new Date().toISOString();
+          newBal = wallets[idx].balance;
+        } else {
+          wallets.push({ email: emailLower, balance: amount, updatedAt: new Date().toISOString() });
+        }
+        writeJson(WALLETS_JSON_PATH, wallets);
+        return newBal;
+      }
+    },
+    deductBalance: async (email, amount) => {
+      const emailLower = email.toLowerCase();
+      if (mode === 'PostgreSQL') {
+        // Only deduct if balance >= amount to prevent negative balance
+        const { rows } = await pgPool.query(
+          `UPDATE customer_wallets 
+           SET balance = balance - $2, updated_at = NOW() 
+           WHERE email = $1 AND balance >= $2 RETURNING balance`,
+          [emailLower, amount]
+        );
+        if (rows.length === 0) {
+          throw new Error('Insufficient wallet balance or wallet not found');
+        }
+        return parseFloat(rows[0].balance);
+      } else {
+        const wallets = readJson(WALLETS_JSON_PATH);
+        const idx = wallets.findIndex(w => w.email === emailLower);
+        if (idx === -1 || Number(wallets[idx].balance) < amount) {
+          throw new Error('Insufficient wallet balance or wallet not found');
+        }
+        wallets[idx].balance = Number(wallets[idx].balance) - amount;
+        wallets[idx].updatedAt = new Date().toISOString();
+        writeJson(WALLETS_JSON_PATH, wallets);
+        return wallets[idx].balance;
       }
     }
   }

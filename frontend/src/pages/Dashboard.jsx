@@ -21,6 +21,7 @@ const Dashboard = () => {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [adminWalletBalance, setAdminWalletBalance] = useState(0);
   
   // Search & Filter State
   const [searchTerm, setSearchTerm] = useState('');
@@ -42,6 +43,12 @@ const Dashboard = () => {
       }
       const data = await response.json();
       setStats(data);
+
+      const walletRes = await fetch('/api/wallet/admin@sharadha.com');
+      if (walletRes.ok) {
+        const walletData = await walletRes.json();
+        setAdminWalletBalance(walletData.balance || 0);
+      }
     } catch (err) {
       console.error(err);
       setError('Could not load dashboard statistics. Is the backend API online?');
@@ -139,6 +146,12 @@ const Dashboard = () => {
   const { metrics, lowStockAlerts, recentCombos, recentOrders } = stats;
 
   const handleOrderStatusUpdate = async (orderId, newStatus) => {
+    if (newStatus === 'Cancelled') {
+      if (!window.confirm("Are you sure you want to cancel this order and process a 50% refund? This action will permanently update the inventory and billing.")) {
+        return null;
+      }
+    }
+    
     try {
       const response = await fetch(`/api/orders/${orderId}/status`, {
         method: 'PUT',
@@ -165,6 +178,8 @@ const Dashboard = () => {
             statusMsg = `has been shipped and is on its way to your delivery address.`;
           } else if (newStatus === 'Delivered') {
             statusMsg = `has been successfully delivered! We hope you love your traditional sweets and snacks.`;
+          } else if (newStatus === 'Cancelled') {
+            statusMsg = `has been cancelled. A 50% refund has been initiated to your original payment method.`;
           } else {
             statusMsg = `status has been updated to: ${newStatus}.`;
           }
@@ -212,7 +227,12 @@ const Dashboard = () => {
       </div>
 
       {/* KPI Grid */}
-      <section className="grid-3" style={{ marginBottom: '8px' }}>
+      <section style={{ 
+        display: 'grid', 
+        gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', 
+        gap: '24px', 
+        marginBottom: '8px' 
+      }}>
         {/* Card 1: Total Revenue */}
         <div className="card" style={{ display: 'flex', alignItems: 'center', gap: '20px', borderTop: '4px solid var(--primary-saffron)' }}>
           <div style={{
@@ -278,6 +298,26 @@ const Dashboard = () => {
             <div style={{ fontSize: '1.8rem', fontWeight: 700, color: metrics.lowStockCount > 0 ? 'var(--red-crimson)' : 'inherit' }}>
               {metrics.lowStockCount}
             </div>
+          </div>
+        </div>
+
+        {/* Card 4: Retained Cancellation Revenue */}
+        <div className="card" style={{ display: 'flex', alignItems: 'center', gap: '20px', borderTop: '4px solid var(--gold)' }}>
+          <div style={{
+            width: '50px',
+            height: '50px',
+            borderRadius: '12px',
+            backgroundColor: '#fffdf8',
+            color: 'var(--gold)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}>
+            <strong style={{ fontSize: '1.4rem' }}>₹</strong>
+          </div>
+          <div>
+            <div style={{ fontSize: '0.85rem', color: 'var(--charcoal-light)', textTransform: 'uppercase', fontWeight: 600 }}>Retained Revenue</div>
+            <div style={{ fontSize: '1.8rem', fontWeight: 800, color: 'var(--gold)' }}>₹{adminWalletBalance.toLocaleString('en-IN')}</div>
           </div>
         </div>
       </section>
@@ -907,6 +947,52 @@ const Dashboard = () => {
                       <span>Grand Total Revenue:</span>
                       <span>₹{selectedOrder.total}</span>
                     </div>
+
+                    {/* ── Admin Payment Received Banner ── */}
+                    <div style={{
+                      marginTop: '8px',
+                      background: selectedOrder.status === 'Cancelled'
+                        ? 'linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%)'
+                        : 'linear-gradient(135deg, #fff8e1 0%, #fff3cd 100%)',
+                      border: `1.5px solid ${selectedOrder.status === 'Cancelled' ? '#ff9800' : 'var(--gold)'}`,
+                      borderRadius: '8px',
+                      padding: '14px 16px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '12px',
+                    }}>
+                      <span style={{ fontSize: '1.6rem' }}>
+                        {selectedOrder.status === 'Cancelled' ? '↩️' : '🏪'}
+                      </span>
+                      <div style={{ flex: 1 }}>
+                        <strong style={{ fontSize: '0.9rem', color: selectedOrder.status === 'Cancelled' ? '#e65100' : '#7c5700', display: 'block' }}>
+                          {selectedOrder.status === 'Cancelled'
+                            ? `Refund Issued: ₹${selectedOrder.total} (50% of original)`
+                            : `✅ Payment Received by Sharadha Stores: ₹${selectedOrder.total}`}
+                        </strong>
+                        <span style={{ fontSize: '0.78rem', color: '#a07000' }}>
+                          Order #{(selectedOrder._id || '').slice(-8).toUpperCase()} · Paid via {selectedOrder.paymentMethod} · Customer: {selectedOrder.customerName}
+                        </span>
+                      </div>
+                      <div style={{
+                        backgroundColor: selectedOrder.status === 'Delivered' ? 'var(--forest-green)' :
+                                         selectedOrder.status === 'Cancelled' ? '#e65100' :
+                                         selectedOrder.status === 'Shipped' ? '#1976d2' :
+                                         selectedOrder.status === 'Packed' ? 'var(--primary-saffron)' : '#757575',
+                        color: 'white',
+                        borderRadius: '4px',
+                        padding: '4px 12px',
+                        fontSize: '0.72rem',
+                        fontWeight: 700,
+                        whiteSpace: 'nowrap',
+                        letterSpacing: '0.5px'
+                      }}>
+                        {selectedOrder.status === 'Cancelled' ? 'REFUNDED' :
+                         selectedOrder.status === 'Delivered' ? '✓ SETTLED' :
+                         selectedOrder.status === 'Shipped' ? 'IN TRANSIT' :
+                         selectedOrder.status === 'Packed' ? 'CONFIRMED' : 'PENDING'}
+                      </div>
+                    </div>
                   </div>
                 </div>
 
@@ -1016,6 +1102,8 @@ const Dashboard = () => {
                       <Check size={16} /> Confirm & Pack Order
                     </button>
                   )}
+
+
                 </div>
 
               </div>

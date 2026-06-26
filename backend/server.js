@@ -25,29 +25,19 @@ app.use('/public', express.static(path.join(__dirname, 'public')));
 // Routes
 app.use('/api', apiRoutes);
 
-// Serve static frontend in production
-if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'development') {
-  app.use(express.static(path.join(__dirname, '../frontend/dist')));
-  
-  // Health check API route
-  app.get('/api/health', (req, res) => {
-    res.json({ status: 'Online', timestamp: new Date() });
-  });
+// Health check API route
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'Online', timestamp: new Date() });
+});
 
-  // Catch-all route to serve React app
-  app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
+// Root welcome message
+app.get('/', (req, res) => {
+  res.json({
+    message: 'Welcome to the Sharadha Stores Festival Combo Pack Builder API!',
+    status: 'Online',
+    timestamp: new Date()
   });
-} else {
-  // Health check / welcome message for dev mode without frontend built
-  app.get('/', (req, res) => {
-    res.json({
-      message: 'Welcome to the Sharadha Stores Festival Combo Pack Builder API!',
-      status: 'Online',
-      timestamp: new Date()
-    });
-  });
-}
+});
 
 // Global error handler
 app.use((err, req, res, next) => {

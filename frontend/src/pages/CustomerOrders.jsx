@@ -23,8 +23,10 @@ const CustomerOrders = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const [invoiceOrder, setInvoiceOrder] = useState(null);
   const [toast, setToast] = useState(null);
   const [lineProgress, setLineProgress] = useState('0%');
+  const [walletBalance, setWalletBalance] = useState(0);
 
   // Feedback, Reviews, and Suggestions States
   const [feedbacks, setFeedbacks] = useState([]);
@@ -61,6 +63,13 @@ const CustomerOrders = () => {
       }
       const data = await response.json();
       setOrders(data);
+      
+      // Fetch Wallet Balance
+      const walletRes = await fetch(`/api/wallet/${encodeURIComponent(user.email)}`);
+      if (walletRes.ok) {
+        const walletData = await walletRes.json();
+        setWalletBalance(walletData.balance || 0);
+      }
     } catch (err) {
       console.error(err);
       setError('Could not retrieve your orders. Is the backend server running?');
@@ -81,7 +90,6 @@ const CustomerOrders = () => {
       console.error('Error fetching feedbacks:', err);
     }
   };
-
   const handleCancelOrder = async (orderId) => {
     if (!window.confirm("Are you sure you want to cancel this order? As per our policy, cancelling will refund/charge only 50% of the total order value.")) {
       return;
@@ -125,6 +133,7 @@ const CustomerOrders = () => {
       setToast({ message: err.message || 'Error cancelling order.', type: 'error' });
     }
   };
+
 
   const handleSuggestionSubmit = async (e) => {
     e.preventDefault();
@@ -304,18 +313,59 @@ const CustomerOrders = () => {
       {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
-        <div>
-          <span style={{ fontSize: '0.8rem', textTransform: 'uppercase', color: 'var(--primary-saffron)', fontWeight: 700, letterSpacing: '1px' }}>
-            Customer Portal
-          </span>
-          <h2 style={{ fontSize: '2.2rem', fontFamily: 'Playfair Display', margin: 0 }}>
-            My Orders & Invoices
-          </h2>
-          <p style={{ color: 'var(--charcoal-light)', margin: 0 }}>
-            Track dispatch logs and review billing summaries for your purchases.
-          </p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          <div>
+            <span style={{ fontSize: '0.8rem', textTransform: 'uppercase', color: 'var(--primary-saffron)', fontWeight: 700, letterSpacing: '1px' }}>
+              Customer Portal
+            </span>
+            <h2 style={{ fontSize: '2.2rem', fontFamily: 'Playfair Display', margin: 0 }}>
+              Welcome back, {user?.name.split(' ')[0]}
+            </h2>
+            <p style={{ color: 'var(--charcoal-light)', margin: 0 }}>
+              Track your festival combos, view history, and give feedback.
+            </p>
+          </div>
         </div>
-        <button onClick={() => navigate('/products')} className="btn btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        
+        {/* Wallet Balance Display */}
+        <div style={{
+          backgroundColor: '#fffdfa',
+          border: '1.5px solid var(--primary-saffron)',
+          borderRadius: '8px',
+          padding: '12px 20px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '12px',
+          boxShadow: '0 4px 12px rgba(230, 110, 37, 0.15)'
+        }}>
+          <div style={{
+            width: '40px',
+            height: '40px',
+            borderRadius: '50%',
+            backgroundColor: 'var(--primary-saffron-light)',
+            color: 'var(--primary-saffron)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontWeight: 'bold',
+            fontSize: '1.2rem'
+          }}>
+            ₹
+          </div>
+          <div>
+            <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: 'var(--charcoal-light)', fontWeight: 600, letterSpacing: '0.5px' }}>
+              My Wallet Balance
+            </div>
+            <div style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--primary-saffron)', lineHeight: 1 }}>
+              ₹{walletBalance.toLocaleString('en-IN')}
+            </div>
+          </div>
+        </div>
+
+        <button 
+          onClick={() => navigate('/products')} 
+          className="btn btn-primary"
+          style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <ShoppingBag size={16} /> Continue Shopping
         </button>
       </div>
@@ -403,17 +453,26 @@ const CustomerOrders = () => {
                     <div style={{
                       display: 'flex',
                       alignItems: 'center',
-                      justifyContent: 'flex-end',
-                      fontSize: '0.8rem',
-                      color: 'var(--primary-saffron)',
-                      fontWeight: 600,
-                      gap: '4px',
+                      justifyContent: 'space-between',
                       borderTop: '1px solid var(--cream-border)',
-                      paddingTop: '8px',
-                      marginTop: '4px'
+                      paddingTop: '10px',
+                      marginTop: '4px',
+                      gap: '8px'
                     }}>
-                      <span>View Detailed Invoice</span>
-                      <Eye size={12} />
+                      <span style={{ fontSize: '0.78rem', color: 'var(--charcoal-light)' }}>Click card to view tracking</span>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); setInvoiceOrder(order); }}
+                        className="btn btn-secondary"
+                        style={{
+                          display: 'flex', alignItems: 'center', gap: '6px',
+                          padding: '6px 14px', fontSize: '0.8rem', fontWeight: 700,
+                          border: '1.5px solid var(--primary-saffron)',
+                          color: 'var(--primary-saffron)', backgroundColor: 'var(--primary-saffron-light)',
+                          borderRadius: '6px', cursor: 'pointer'
+                        }}
+                      >
+                        <Eye size={13} /> View Invoice
+                      </button>
                     </div>
                   </div>
                 );
@@ -499,7 +558,7 @@ const CustomerOrders = () => {
                             Order Cancelled
                           </strong>
                           <span style={{ fontSize: '0.9rem', color: '#5c1d1d', lineHeight: 1.4 }}>
-                            This order has been cancelled. In accordance with our cancellation policy, a 50% refund has been processed, and the remaining 50% of the total order value has been deducted.
+                            This order has been cancelled. In accordance with our cancellation policy, a 50% refund (₹{Math.round(selectedOrder.total / 2)}) has been credited to your <strong>Customer Wallet</strong>. You can use this balance on your next order!
                           </span>
                           <span style={{ fontSize: '0.8rem', color: '#8c3d3d', marginTop: '4px', fontWeight: 600 }}>
                             All reserved items have been successfully restocked back to the inventory.
@@ -850,18 +909,23 @@ const CustomerOrders = () => {
                       Products Included:
                     </span>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                      {selectedOrder.items && selectedOrder.items.map((item, i) => (
+                      {selectedOrder.items && selectedOrder.items.length > 0 ? selectedOrder.items.map((item, i) => (
                         <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#fffdfa', padding: '10px 12px', border: '1px solid var(--cream-border)', borderRadius: '4px' }}>
                           <div>
-                            <strong style={{ fontSize: '0.9rem', display: 'block' }}>{item.productName}</strong>
+                            <strong style={{ fontSize: '0.9rem', display: 'block' }}>{item.productName || item.name}</strong>
                             <span style={{ fontSize: '0.75rem', color: 'var(--charcoal-light)' }}>Price: ₹{item.price} each</span>
                           </div>
                           <div style={{ textAlign: 'right' }}>
                             <span style={{ fontSize: '0.8rem', color: 'var(--charcoal-light)' }}>Qty: {item.quantity}</span>
-                            <div style={{ fontWeight: 600, fontSize: '0.95rem' }}>₹{item.price * item.quantity}</div>
+                            <div style={{ fontWeight: 600, fontSize: '0.95rem' }}>₹{(item.price * item.quantity).toFixed(0)}</div>
                           </div>
                         </div>
-                      ))}
+                      )) : (
+                        <div style={{ padding: '12px', backgroundColor: '#fffdfa', border: '1px solid var(--cream-border)', borderRadius: '4px', textAlign: 'center', color: 'var(--charcoal-light)', fontSize: '0.85rem' }}>
+                          <strong style={{ display: 'block', marginBottom: '4px' }}>{selectedOrder.comboName}</strong>
+                          <span>Custom festival combo pack</span>
+                        </div>
+                      )}
                     </div>
                   </div>
 
@@ -906,7 +970,7 @@ const CustomerOrders = () => {
                     </div>
                     {selectedOrder.giftCharges > 0 && (
                       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <span>Gift wrapping fee:</span>
+                        <span>🎁 Gift Wrapping:</span>
                         <span>₹{selectedOrder.giftCharges}</span>
                       </div>
                     )}
@@ -923,7 +987,33 @@ const CustomerOrders = () => {
                       <span>Grand Total:</span>
                       <span>₹{selectedOrder.total}</span>
                     </div>
+
+                    {selectedOrder.status === 'Cancelled' && (
+                      <div style={{ 
+                        marginTop: '12px', 
+                        padding: '12px', 
+                        backgroundColor: '#fffdf8', 
+                        border: '1.5px dashed var(--gold)', 
+                        borderRadius: '6px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '8px',
+                        fontSize: '0.85rem'
+                      }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 600, color: 'var(--forest-green)' }}>
+                          <span>✅ Refunded to Customer Wallet (50%):</span>
+                          <span>+₹{selectedOrder.total}</span>
+                        </div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 600, color: '#8c3d3d' }}>
+                          <span>❌ Store Cancellation Fee (50%):</span>
+                          <span>-₹{selectedOrder.total}</span>
+                        </div>
+                      </div>
+                    )}
+
                   </div>
+
+
 
                   {/* Cancel Order Button */}
                   {['Pending', 'Packed'].includes(selectedOrder.status) && (
@@ -952,9 +1042,7 @@ const CustomerOrders = () => {
                     >
                       <AlertTriangle size={16} /> Cancel Order (50% Refund Policy)
                     </button>
-                  )}
-
-                  {/* Order Review Section (only for Delivered orders) */}
+                  )}                  {/* Order Review Section (only for Delivered orders) */}
                   {selectedOrder.status === 'Delivered' && (() => {
                     const orderReview = feedbacks.find(f => f.orderId === selectedOrder._id && f.type === 'review');
                     if (orderReview) {
@@ -1330,6 +1418,194 @@ const CustomerOrders = () => {
           display: inline-block;
         }
       `}</style>
+
+      {/* ─── Customer Invoice Modal ─── */}
+      {invoiceOrder && (() => {
+        const inv = invoiceOrder;
+        const { orderDateFormatted, estDateFormatted } = getEstimatedDates(inv.createdAt, inv.status);
+        const statusColor = inv.status === 'Delivered' ? 'var(--forest-green)' :
+                            inv.status === 'Cancelled' ? '#c62828' :
+                            inv.status === 'Shipped'   ? '#1565c0' :
+                            inv.status === 'Packed'    ? 'var(--primary-saffron)' : '#757575';
+        return (
+          <div
+            style={{
+              position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
+              backgroundColor: 'rgba(44,36,29,0.65)', backdropFilter: 'blur(5px)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              zIndex: 2000, padding: '20px'
+            }}
+            onClick={() => setInvoiceOrder(null)}
+          >
+            <div
+              onClick={e => e.stopPropagation()}
+              style={{
+                backgroundColor: 'var(--white)', borderRadius: '14px',
+                border: '3px solid var(--gold)', maxWidth: '560px', width: '100%',
+                maxHeight: '92vh', overflowY: 'auto',
+                boxShadow: '0 24px 60px rgba(0,0,0,0.25)',
+                animation: 'fadeIn 0.25s ease-out'
+              }}
+            >
+              {/* Modal Header */}
+              <div style={{
+                background: 'linear-gradient(135deg, var(--primary-saffron) 0%, var(--gold) 100%)',
+                padding: '20px 24px', borderRadius: '11px 11px 0 0',
+                display: 'flex', justifyContent: 'space-between', alignItems: 'center'
+              }}>
+                <div>
+                  <h3 style={{ margin: 0, color: 'white', fontFamily: 'Playfair Display', fontSize: '1.3rem' }}>
+                    🧾 Order Invoice
+                  </h3>
+                  <span style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.85)' }}>
+                    ID: <code style={{ color: 'white' }}>{inv._id}</code>
+                  </span>
+                </div>
+                <button
+                  onClick={() => setInvoiceOrder(null)}
+                  style={{ background: 'rgba(255,255,255,0.2)', border: 'none', color: 'white', borderRadius: '50%', width: '32px', height: '32px', cursor: 'pointer', fontSize: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                >✕</button>
+              </div>
+
+              {/* Modal Body */}
+              <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+
+                {/* Store + Status */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div>
+                    <div style={{ fontFamily: 'Playfair Display', fontSize: '1.1rem', fontWeight: 700, color: 'var(--primary-saffron)' }}>🏪 Sharadha Stores</div>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--charcoal-light)' }}>Traditional Sweets & Festival Hampers</div>
+                  </div>
+                  <span style={{ padding: '5px 14px', borderRadius: '20px', fontSize: '0.8rem', fontWeight: 700, backgroundColor: statusColor + '20', color: statusColor, border: `1.5px solid ${statusColor}` }}>
+                    {inv.status}
+                  </span>
+                </div>
+
+                {/* Date Grid */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                  <div style={{ backgroundColor: 'var(--cream-dark)', padding: '10px 14px', borderRadius: '8px', border: '1px solid var(--cream-border)' }}>
+                    <span style={{ fontSize: '0.7rem', color: 'var(--charcoal-light)', display: 'block' }}>Order Date:</span>
+                    <strong style={{ fontSize: '0.85rem' }}>{orderDateFormatted}</strong>
+                  </div>
+                  <div style={{ backgroundColor: 'var(--cream-dark)', padding: '10px 14px', borderRadius: '8px', border: '1px solid var(--cream-border)' }}>
+                    <span style={{ fontSize: '0.7rem', color: 'var(--charcoal-light)', display: 'block' }}>
+                      {inv.status === 'Delivered' ? 'Delivered On:' : 'Est. Delivery:'}
+                    </span>
+                    <strong style={{ fontSize: '0.85rem', color: 'var(--forest-green)' }}>{estDateFormatted}</strong>
+                  </div>
+                </div>
+
+                {/* Customer Info */}
+                <div style={{ backgroundColor: '#fffdfa', border: '1px solid var(--cream-border)', borderRadius: '8px', padding: '14px 16px' }}>
+                  <div style={{ fontSize: '0.72rem', color: 'var(--charcoal-light)', textTransform: 'uppercase', fontWeight: 700, marginBottom: '8px' }}>Customer Details</div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', fontSize: '0.88rem' }}>
+                    <div><strong>{inv.customerName}</strong></div>
+                    <div style={{ color: 'var(--charcoal-light)' }}>{inv.customerEmail}</div>
+                    {inv.phoneNumber && <div style={{ color: 'var(--primary-saffron)' }}>📞 {inv.phoneNumber}</div>}
+                    <div style={{ display: 'flex', gap: '6px', marginTop: '4px', color: 'var(--charcoal-light)' }}>
+                      <MapPin size={14} style={{ flexShrink: 0, marginTop: '2px' }} />
+                      <span>{inv.shippingAddress}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Items */}
+                <div>
+                  <div style={{ fontSize: '0.72rem', color: 'var(--charcoal-light)', textTransform: 'uppercase', fontWeight: 700, marginBottom: '8px' }}>Products Ordered</div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                    {inv.items && inv.items.length > 0 ? inv.items.map((item, i) => (
+                      <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 14px', backgroundColor: '#fffdfa', border: '1px solid var(--cream-border)', borderRadius: '6px' }}>
+                        <div>
+                          <strong style={{ fontSize: '0.9rem' }}>{item.productName || item.name}</strong>
+                          <div style={{ fontSize: '0.75rem', color: 'var(--charcoal-light)' }}>₹{item.price} × {item.quantity}</div>
+                        </div>
+                        <strong style={{ fontSize: '0.95rem', color: 'var(--dark-charcoal)' }}>₹{(item.price * item.quantity).toFixed(0)}</strong>
+                      </div>
+                    )) : (
+                      <div style={{ padding: '12px 14px', backgroundColor: '#fffdfa', border: '1px solid var(--cream-border)', borderRadius: '6px' }}>
+                        <strong>{inv.comboName}</strong>
+                        <div style={{ fontSize: '0.78rem', color: 'var(--charcoal-light)' }}>Custom festival combo pack</div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Bill Summary */}
+                <div style={{ borderTop: '2px dashed var(--cream-border)', paddingTop: '16px', display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '0.88rem' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span style={{ color: 'var(--charcoal-light)' }}>Subtotal</span>
+                    <span>₹{inv.subtotal}</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span style={{ color: 'var(--charcoal-light)' }}>GST (5%)</span>
+                    <span>₹{inv.tax}</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span style={{ color: 'var(--charcoal-light)' }}>Shipping</span>
+                    <span>{inv.shipping === 0 ? <strong style={{ color: 'var(--forest-green)' }}>FREE</strong> : `₹${inv.shipping}`}</span>
+                  </div>
+                  {inv.giftCharges > 0 && (
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span style={{ color: 'var(--charcoal-light)' }}>🎁 Gift Wrapping</span>
+                      <span>₹{inv.giftCharges}</span>
+                    </div>
+                  )}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '2px solid var(--cream-border)', paddingTop: '12px', marginTop: '4px', fontWeight: 800, fontSize: '1.2rem', color: 'var(--primary-saffron)' }}>
+                    <span>Grand Total</span>
+                    <span>₹{inv.total}</span>
+                  </div>
+                </div>
+
+                {/* Payment Method */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', backgroundColor: 'var(--cream-dark)', padding: '12px 16px', borderRadius: '8px', border: '1px solid var(--cream-border)' }}>
+                  <CreditCard size={18} color="var(--gold)" />
+                  <div>
+                    <div style={{ fontSize: '0.72rem', color: 'var(--charcoal-light)' }}>Payment Method</div>
+                    <strong style={{ fontSize: '0.9rem' }}>{inv.paymentMethod}</strong>
+                  </div>
+                  <div style={{ marginLeft: 'auto', fontSize: '0.75rem', fontWeight: 700, color: inv.status === 'Cancelled' ? '#c62828' : 'var(--forest-green)', backgroundColor: inv.status === 'Cancelled' ? '#fce4e4' : '#e8f5e9', padding: '4px 10px', borderRadius: '4px' }}>
+                    {inv.status === 'Cancelled' ? '↩ REFUND' : '✓ PAID'}
+                  </div>
+                </div>
+
+                {/* Order History Timeline */}
+                {inv.history && inv.history.length > 0 && (
+                  <div>
+                    <div style={{ fontSize: '0.72rem', color: 'var(--charcoal-light)', textTransform: 'uppercase', fontWeight: 700, marginBottom: '10px' }}>Order Timeline</div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', paddingLeft: '4px' }}>
+                      {[...inv.history].reverse().map((log, i) => {
+                        const t = new Date(log.timestamp);
+                        const tFmt = t.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) + ' · ' + t.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+                        const isFirst = i === 0;
+                        return (
+                          <div key={i} style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
+                            <div style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: isFirst ? 'var(--primary-saffron)' : 'var(--forest-green)', flexShrink: 0, marginTop: '4px', border: '2px solid white', boxShadow: `0 0 0 2px ${isFirst ? 'var(--primary-saffron)' : 'var(--cream-border)'}` }} />
+                            <div>
+                              <strong style={{ fontSize: '0.82rem', color: isFirst ? 'var(--primary-saffron)' : 'var(--dark-charcoal)', display: 'block' }}>
+                                {log.status === 'Pending' ? 'Order Placed' : log.status === 'Packed' ? 'Confirmed & Packed' : log.status === 'Shipped' ? 'Shipped & Dispatched' : log.status === 'Delivered' ? 'Delivered' : log.status === 'Cancelled' ? 'Order Cancelled' : log.status}
+                              </strong>
+                              <span style={{ fontSize: '0.73rem', color: 'var(--charcoal-light)' }}>{tFmt}</span>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {/* Close Button */}
+                <button
+                  onClick={() => setInvoiceOrder(null)}
+                  className="btn btn-primary"
+                  style={{ width: '100%', justifyContent: 'center', marginTop: '4px' }}
+                >
+                  Close Invoice
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
     </div>
   );
 };

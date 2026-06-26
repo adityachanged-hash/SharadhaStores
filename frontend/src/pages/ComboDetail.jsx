@@ -39,6 +39,9 @@ const ComboDetail = () => {
   const [shippingAddress, setShippingAddress] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('UPI');
   const [ordering, setOrdering] = useState(false);
+  const [walletBalance, setWalletBalance] = useState(0);
+  const [useWallet, setUseWallet] = useState(false);
+  const [phoneNumber, setPhoneNumber] = useState('');
 
   const handlePlaceOrder = async (e) => {
     e.preventDefault();
@@ -49,15 +52,23 @@ const ComboDetail = () => {
 
     setOrdering(true);
     try {
+      const subtotal = combo.finalPrice;
+      const tax = Math.round(subtotal * 0.05);
+      const shipping = subtotal >= 1000 ? 0 : 80;
+      const initialTotal = subtotal + tax + shipping;
+      const walletApplied = useWallet ? Math.min(walletBalance, initialTotal) : 0;
+
       const response = await fetch('/api/orders', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           customerName: user.name,
           customerEmail: user.email,
-          comboId: id,
+          comboId: combo._id,
           shippingAddress,
-          paymentMethod
+          paymentMethod,
+          phoneNumber: phoneNumber || '9999999999',
+          walletApplied
         })
       });
       const data = await response.json();
@@ -99,6 +110,13 @@ const ComboDetail = () => {
 
   useEffect(() => {
     fetchComboDetail();
+    
+    if (user) {
+      fetch(`/api/wallet/${encodeURIComponent(user.email)}`)
+        .then(res => res.ok ? res.json() : { balance: 0 })
+        .then(data => setWalletBalance(data.balance || 0))
+        .catch(console.error);
+    }
   }, [id]);
 
   // Handle process action (/api/combos/:id/process)
@@ -656,6 +674,34 @@ const ComboDetail = () => {
                 </select>
               </div>
 
+              {walletBalance > 0 && (
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '10px',
+                  backgroundColor: '#fffdf8',
+                  padding: '12px 14px',
+                  border: '1.5px solid var(--primary-saffron)',
+                  borderRadius: '6px',
+                  cursor: 'pointer'
+                }} onClick={() => setUseWallet(prev => !prev)}>
+                  <input
+                    type="checkbox"
+                    id="useWalletCombo"
+                    checked={useWallet}
+                    onChange={() => {}}
+                    onClick={(e) => e.stopPropagation()}
+                    style={{ width: '18px', height: '18px', cursor: 'pointer', accentColor: 'var(--primary-saffron)' }}
+                  />
+                  <label htmlFor="useWalletCombo" style={{ fontSize: '0.9rem', fontWeight: 700, cursor: 'pointer', display: 'flex', justifyContent: 'space-between', width: '100%', margin: 0, color: 'var(--dark-charcoal)' }}>
+                    <span>💳 Use Wallet Balance (Available: ₹{walletBalance})</span>
+                    <span style={{ color: 'var(--primary-saffron)' }}>
+                      -₹{useWallet ? Math.min(walletBalance, finalPrice + Math.round(finalPrice * 0.05) + (finalPrice >= 1000 ? 0 : 80)) : 0}
+                    </span>
+                  </label>
+                </div>
+              )}
+
               {/* Invoice Breakup */}
               <div style={{
                 borderTop: '2px solid var(--cream-border)',
@@ -677,6 +723,12 @@ const ComboDetail = () => {
                   <span>Shipping Fee:</span>
                   <span>{finalPrice >= 1000 ? <strong style={{ color: 'var(--forest-green)' }}>FREE</strong> : `₹80`}</span>
                 </div>
+                {useWallet && walletBalance > 0 && (
+                  <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--primary-saffron)', fontWeight: 600 }}>
+                    <span>Wallet Deduction:</span>
+                    <span>-₹{Math.min(walletBalance, finalPrice + Math.round(finalPrice * 0.05) + (finalPrice >= 1000 ? 0 : 80))}</span>
+                  </div>
+                )}
                 <div style={{
                   display: 'flex',
                   justifyContent: 'space-between',
@@ -688,7 +740,9 @@ const ComboDetail = () => {
                   color: 'var(--primary-saffron)'
                 }}>
                   <span>Invoice Grand Total:</span>
-                  <span>₹{finalPrice + Math.round(finalPrice * 0.05) + (finalPrice >= 1000 ? 0 : 80)}</span>
+                  <span>
+                    ₹{(finalPrice + Math.round(finalPrice * 0.05) + (finalPrice >= 1000 ? 0 : 80)) - (useWallet ? Math.min(walletBalance, finalPrice + Math.round(finalPrice * 0.05) + (finalPrice >= 1000 ? 0 : 80)) : 0)}
+                  </span>
                 </div>
               </div>
 

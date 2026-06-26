@@ -9,61 +9,61 @@ const getFestivalPackingPreview = (type) => {
   switch (type) {
     case 'Diwali':
       return {
-        image: '/public/images/packaging/gift_pack.png',
+        image: '/images/packaging/gift_pack.png',
         title: 'Royal Diwali Shahi Gift Box',
         desc: 'A premium golden-foiled box decorated with traditional diyas and floral motifs, wrapped in saffron ribbon. Ideal for Diwali gifting.'
       };
     case 'Pongal':
       return {
-        image: '/public/images/packaging/combo_pack.png',
+        image: '/images/packaging/combo_pack.png',
         title: 'Pongal Traditional Harvest Assortment',
         desc: 'An eco-friendly partitioned hamper representing the traditional harvest festival, sealed with a fresh sugarcane pattern.'
       };
     case 'Sankranti':
       return {
-        image: '/public/images/packaging/combo_pack.png',
+        image: '/images/packaging/combo_pack.png',
         title: 'Sankranti Traditional Harvest Pack',
         desc: 'An eco-friendly partitioned hamper representing the traditional harvest festival, sealed with a fresh sugarcane pattern.'
       };
     case 'Holi':
       return {
-        image: '/public/images/packaging/gift_pack.png',
+        image: '/images/packaging/gift_pack.png',
         title: 'Holi Gulal & Sweet Shahi Box',
         desc: 'A premium box adorned with color splash patterns, wrapped in saffron ribbon. Ideal for sharing festive sweet joy.'
       };
     case 'Raksha Bandhan':
       return {
-        image: '/public/images/packaging/gift_pack.png',
+        image: '/images/packaging/gift_pack.png',
         title: 'Rakhi Premium Gifting Box',
         desc: 'An exquisite box decorated with beautiful Rakhi motifs and golden ribbons. Perfect for sibling sweets celebrations.'
       };
     case 'Eid':
       return {
-        image: '/public/images/packaging/gift_pack.png',
+        image: '/images/packaging/gift_pack.png',
         title: 'Eid Mubarak Shahi Box',
         desc: 'A premium crescent-adorned box wrapped in elegant ribbons. Perfect for sharing festive sweetness.'
       };
     case 'Christmas':
       return {
-        image: '/public/images/packaging/gift_pack.png',
+        image: '/images/packaging/gift_pack.png',
         title: 'Merry Christmas Holiday Box',
         desc: 'A festive red-and-green theme gift box wrapped in ribbon, bringing sweet warmth and holiday wishes.'
       };
     case 'Wedding Return Gift':
       return {
-        image: '/public/images/packaging/gift_pack.png',
+        image: '/images/packaging/gift_pack.png',
         title: 'Vivah Shahi Return Gift Pack',
         desc: 'An exquisite red-gold velvet-textured packaging designed for wedding ceremonies and prestige family return gifts.'
       };
     case 'Snack Combo':
       return {
-        image: '/public/images/packaging/combo_pack.png',
+        image: '/images/packaging/combo_pack.png',
         title: 'Saffron Crispy & Sweet Combo Box',
         desc: 'A moisture-locked partitioned snack container ideal for savories like Murukku/Mathri alongside traditional Ghee sweets.'
       };
     default:
       return {
-        image: '/public/images/packaging/combo_pack.png',
+        image: '/images/packaging/combo_pack.png',
         title: 'Custom Assorted Hamper Box',
         desc: 'Your custom selection of traditional sweets and savories arranged in our classic saffron partitioned container.'
       };

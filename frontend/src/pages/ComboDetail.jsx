@@ -360,7 +360,7 @@ const ComboDetail = () => {
                       <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
                         {product.image ? (
                           <img 
-                            src={product.image} 
+                            src={product.image.includes('/') ? product.image.replace('/images/', '/images/') : `/images/products/${product.image}`} 
                             alt={product.name} 
                             style={{ width: '48px', height: '48px', objectFit: 'cover', borderRadius: '4px', border: '1px solid var(--border-light)' }} 
                           />

@@ -1232,7 +1232,7 @@ const CustomerOrders = () => {
             }} className="packaging-card">
               <div style={{ width: '180px', height: '150px', overflow: 'hidden', flexShrink: 0 }}>
                 <img 
-                  src="/public/images/packaging/combo_pack.png" 
+                  src="/images/packaging/combo_pack.png" 
                   alt="Combo Packing Example" 
                   style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.5s ease' }} 
                   className="packaging-img"

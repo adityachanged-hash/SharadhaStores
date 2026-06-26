@@ -33,10 +33,17 @@ const Login = () => {
     setError('');
 
     try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
+      const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
+      const response = await fetch(`${API_URL}/api/auth/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          email,
+          password
+        })
       });
 
       const data = await response.json();
@@ -99,9 +106,9 @@ const Login = () => {
           overflow: 'hidden'
         }}>
           {/* Large animated background logo */}
-          <img 
-            src="/public/images/logo.png" 
-            alt="" 
+          <img
+            src="/public/images/logo.png"
+            alt=""
             style={{
               position: 'absolute',
               width: '400px',
@@ -113,7 +120,7 @@ const Login = () => {
               animation: 'rotateBgLogo 20s linear infinite',
               pointerEvents: 'none',
               zIndex: 1
-            }} 
+            }}
           />
 
           {/* Elegant floating background dust particles */}
@@ -161,7 +168,7 @@ const Login = () => {
                 animation: 'ripple 3s cubic-bezier(0.1, 0.8, 0.3, 1) infinite',
                 pointerEvents: 'none'
               }}></div>
-              
+
               {/* Ripple Ring 2 */}
               <div style={{
                 position: 'absolute',
@@ -179,9 +186,9 @@ const Login = () => {
               }}></div>
 
               {/* Saffron Glowing Central Logo */}
-              <img 
-                src="/public/images/logo.png" 
-                alt="Sharadha Stores Logo" 
+              <img
+                src="/public/images/logo.png"
+                alt="Sharadha Stores Logo"
                 style={{
                   width: '100px',
                   height: '100px',
@@ -192,7 +199,7 @@ const Login = () => {
                   position: 'relative',
                   zIndex: 2,
                   animation: 'bounceLogo 2s ease-in-out infinite'
-                }} 
+                }}
               />
             </div>
 
@@ -208,7 +215,7 @@ const Login = () => {
             }}>
               Welcome to Sharadha Stores
             </h1>
-            
+
             {/* Subtitle */}
             <p style={{
               fontSize: '1.25rem',
@@ -277,11 +284,11 @@ const Login = () => {
               Initializing workspace components...
             </span>
             {/* WhatsApp Website Visit Notify */}
-            <a 
+            <a
               href={`https://wa.me/919182730806?text=${encodeURIComponent(
                 `Hello Sharadha Stores, I am visiting your website and browsing your traditional festival combo hampers!`
               )}`}
-              target="_blank" 
+              target="_blank"
               rel="noopener noreferrer"
               style={{
                 display: 'inline-flex',
@@ -381,9 +388,9 @@ const Login = () => {
           textAlign: 'center',
           borderBottom: '1px solid var(--cream-border)'
         }}>
-          <img 
-            src="/public/images/logo.png" 
-            alt="Sharadha Stores Logo" 
+          <img
+            src="/public/images/logo.png"
+            alt="Sharadha Stores Logo"
             style={{
               width: '60px',
               height: '60px',
@@ -393,7 +400,7 @@ const Login = () => {
               marginBottom: '12px',
               boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
               display: 'inline-block'
-            }} 
+            }}
           />
           <h2 style={{ fontSize: '1.8rem', fontFamily: 'Playfair Display', color: 'var(--dark-charcoal)' }}>
             Sharadha Stores Portal
@@ -405,7 +412,7 @@ const Login = () => {
 
         {/* Form Body */}
         <form onSubmit={handleLoginSubmit} style={{ padding: '30px 24px 20px' }}>
-          
+
           {error && (
             <div className="alert alert-error" style={{ padding: '10px 12px', fontSize: '0.9rem', marginBottom: '20px' }}>
               <AlertCircle size={16} />
@@ -474,7 +481,7 @@ const Login = () => {
           }}>
             <Sparkles size={12} color="var(--primary-saffron)" /> Quick-Fill Demo Profiles:
           </h4>
-          
+
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
             <button
               type="button"
@@ -484,7 +491,7 @@ const Login = () => {
             >
               🏵️ Store Admin
             </button>
-            
+
             <button
               type="button"
               onClick={() => handleQuickLogin('customer@gmail.com', 'customer123')}

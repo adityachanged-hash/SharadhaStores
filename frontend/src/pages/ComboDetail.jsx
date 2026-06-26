@@ -275,7 +275,7 @@ const ComboDetail = () => {
             }}>
               {image ? (
                 <img 
-                  src={image} 
+                  src={image.startsWith('/images/') ? image : (image.startsWith('/public/images/') ? image.replace('/public/images/', '/images/packaging/') : `/images/packaging/${image}`)} 
                   alt={comboName} 
                   style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                   onError={(e) => e.target.style.display = 'none'}
@@ -360,7 +360,7 @@ const ComboDetail = () => {
                       <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
                         {product.image ? (
                           <img 
-                            src={product.image.includes('/') ? product.image.replace('/images/', '/images/') : `/images/products/${product.image}`} 
+                            src={product.image.startsWith('/images/') ? product.image : (product.image.startsWith('/public/images/') ? product.image.replace('/public/images/', '/images/products/') : `/images/products/${product.image}`)} 
                             alt={product.name} 
                             style={{ width: '48px', height: '48px', objectFit: 'cover', borderRadius: '4px', border: '1px solid var(--border-light)' }} 
                           />

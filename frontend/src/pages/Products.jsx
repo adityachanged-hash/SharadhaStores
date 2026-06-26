@@ -505,7 +505,7 @@ const Products = () => {
                 }}>
                   {product.image ? (
                     <img 
-                      src={product.image.includes('/') ? product.image.replace('/images/', '/images/') : `/images/products/${product.image}`} 
+                      src={product.image.startsWith('/images/') ? product.image : (product.image.startsWith('/public/images/') ? product.image.replace('/public/images/', '/images/products/') : `/images/products/${product.image}`)} 
                       alt={product.name} 
                       style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                     />

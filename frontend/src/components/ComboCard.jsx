@@ -77,7 +77,7 @@ const ComboCard = ({ combo, onDelete, onPublishToggle }) => {
       }}>
         {image ? (
           <img 
-            src={image} 
+            src={image.startsWith('/images/') ? image : (image.startsWith('/public/images/') ? image.replace('/public/images/', '/images/packaging/') : `/images/packaging/${image}`)} 
             alt={comboName} 
             style={{ width: '100%', height: '100%', objectFit: 'cover' }}
             onError={(e) => {
